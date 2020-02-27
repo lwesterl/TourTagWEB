@@ -1,6 +1,8 @@
 import React, {useState} from "react";
 import ReactDOM from "react-dom";
+import { Redirect } from "react-router-dom";
 import { Button, FormGroup, FormControl, FormLabel } from "react-bootstrap";
+import { setStoredState } from "../App/App";
 
 export default function Login(props) {
   const [username, setUsername] = useState("");
@@ -16,6 +18,8 @@ export default function Login(props) {
     // TODO:  Try to login to the backend here
     if (!auth_ok) {
       props.userHasAuthenticated(true);
+      setStoredState("authState", true);
+      setStoredState("username", username);
       props.history.push("/trip"); // redirect
     }
     else {
@@ -26,6 +30,10 @@ export default function Login(props) {
       );
       ReactDOM.render(element, document.getElementById("error_div"));
     }
+  }
+
+  if (props.isAuthenticated) {
+    return <Redirect push to="/"/>;
   }
 
   return (
