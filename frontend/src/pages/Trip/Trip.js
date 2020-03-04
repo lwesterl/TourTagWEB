@@ -6,7 +6,7 @@ import TripNavigation from "../../components/TripNavigation.js";
 
 const TourMapImage = "/TourMap.png";
 const DepartureTimeOffset = 2; // Time which is added to current time by default
-const TourStatus = ["At port", "Traveling to next port", "Not on tour"];
+export const TripStatus = ["At port", "Traveling to next port", "Not on tour"];
 
 
 /**
@@ -76,7 +76,7 @@ export default function Trip() {
     return (
       <div>
         <h2>Current status</h2>
-        <TripNavigation status={status} onSelect={NavigationSelect} TourStatus={TourStatus}/>
+        <TripNavigation status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
           <Form>
             <Form.Group>
               <Form.Label>Departure port</Form.Label>
@@ -107,7 +107,7 @@ export default function Trip() {
     return (
       <div>
         <h2>Current status</h2>
-        <TripNavigation status={status} onSelect={NavigationSelect} TourStatus={TourStatus}/>
+        <TripNavigation status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
         <Form>
           <Form.Group>
             <Form.Label>Current port</Form.Label>
@@ -130,7 +130,7 @@ export default function Trip() {
     return (
       <div>
         <h2>Current status</h2>
-        <TripNavigation status={status} onSelect={NavigationSelect} TourStatus={TourStatus}/>
+        <TripNavigation status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
       </div>
     );
   }

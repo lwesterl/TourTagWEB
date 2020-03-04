@@ -9,7 +9,7 @@ export default class TripNavigation extends React.Component {
   render() {
     return (
       <Nav variant="pills">
-        {this.props.TourStatus.map((value, index) => {
+        {this.props.TripStatus.map((value, index) => {
           return (<Nav.Item key={index}>
                     <Nav.Link
                     key={index} eventKey={value}
