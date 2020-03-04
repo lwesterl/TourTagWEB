@@ -2,7 +2,10 @@ import React, {useState} from "react";
 import ReactDOM from "react-dom";
 import { Redirect } from "react-router-dom";
 import { Button, FormGroup, FormControl, FormLabel } from "react-bootstrap";
+
 import { setStoredState } from "../App/App";
+import "./Login.css";
+
 
 export default function Login(props) {
   const [username, setUsername] = useState("");
@@ -38,23 +41,26 @@ export default function Login(props) {
 
   return (
     <div>
+      <h2 className="title">Login</h2>
       <div id="error_div"/>
-      <form onSubmit={formSubmit}>
+      <form onSubmit={formSubmit} className="form">
         <FormGroup>
-          <FormLabel>Username</FormLabel>
-          <FormControl
+          <FormLabel>Username:</FormLabel>
+          <FormControl style={{marginBottom: "3%"}}
             autoFocus
             type="text"
             value={username}
             onChange={e => setUsername(e.target.value)}
+            className="form"
           />
         </FormGroup>
         <FormGroup controlId="password">
-          <FormLabel>Password</FormLabel>
-          <FormControl
+          <FormLabel>Password:</FormLabel>
+          <FormControl style={{marginBottom: "3%"}}
             value={password}
             onChange={e => setPassword(e.target.value)}
             type="password"
+            className="form"
           />
         </FormGroup>
         <Button block disabled={!validateForm()} type="submit">

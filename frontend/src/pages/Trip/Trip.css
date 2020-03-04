@@ -1,0 +1,25 @@
+/* Stylesheet for Trip page */
+
+.port-select {
+  float: left;
+  margin-left: 5%;
+  padding-bottom: 30px;
+}
+
+.trip-button {
+  position: relative;
+  top: 50%;
+  padding-top: 100px;
+}
+
+#port-img {
+  float: left;
+  margin-left: 10%;
+  max-width: 50%;
+  padding-bottom: 40px;
+}
+
+.timer {
+  color: black;
+  padding-right: 45px;
+}

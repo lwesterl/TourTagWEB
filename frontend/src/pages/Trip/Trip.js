@@ -3,6 +3,7 @@ import { Form, Button } from "react-bootstrap";
 import TimePicker from "react-time-picker";
 
 import TripNavigation from "../../components/TripNavigation.js";
+import "./Trip.css";
 
 const TourMapImage = "/TourMap.png";
 const DepartureTimeOffset = 2; // Time which is added to current time by default
@@ -19,12 +20,15 @@ export default function Trip() {
   let currentPort = ""; // TODO from API
   const [status, setStatus] = useState("Not on tour"); // TODO from API
   const [departureTime, setDepartureTime] = useState(getDepartureTime());
+  console.log(departureTime)
 
   function getDepartureTime() {
     // TODO connect this to API
     let date = new Date();
     let minutes = date.getMinutes() >= 10 ? `${date.getMinutes()}` : `0${date.getMinutes()}`
-    return `${date.getHours() + DepartureTimeOffset}:${minutes}`;
+    let hours = date.getHours() + DepartureTimeOffset;
+    if (hours > 23) hours = hours - 24;
+    return `${hours}:${minutes}`;
   }
 
   function NavigationSelect(eventKey, event) {
@@ -75,20 +79,22 @@ export default function Trip() {
   if (status === "Not on tour") {
     return (
       <div>
-        <h2>Current status</h2>
-        <TripNavigation status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
+        <h2 className="title">Trip</h2>
+        <TripNavigation className="navigation" status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
+        <img src={process.env.PUBLIC_URL + TourMapImage} alt="Tour map" id="port-img"/>
+        <span className="port-select">
           <Form>
-            <Form.Group>
-              <Form.Label>Departure port</Form.Label>
-              <Form.Control as="select" defaultValue={departurePort} onChange={DeparturePortSelect}>
+            <Form.Group style={{paddingBottom: "3%"}}>
+              <Form.Label>Departure port:</Form.Label>
+              <Form.Control as="select" defaultValue={departurePort} onChange={DeparturePortSelect} style={{marginBottom: "3%"}}>
                 {ports.map((value, index) => {
                   return <option key={index}>{value}</option>
                 })}
               </Form.Control>
             </Form.Group>
-            <Form.Group>
-              <Form.Label>Destination port</Form.Label>
-              <Form.Control as="select" defaultValue={destinationPort} onChange={DestinationPortSelect}>
+            <Form.Group style={{paddingBottom: "50px"}}>
+              <Form.Label>Destination port:</Form.Label>
+              <Form.Control as="select" defaultValue={destinationPort} onChange={DestinationPortSelect} style={{marginBottom: "3%"}}>
                 {ports.map((value, index) => {
                   return <option key={index}>{value}</option>
                 })}
@@ -96,41 +102,41 @@ export default function Trip() {
             </Form.Group>
           </Form>
 
-        <img src={process.env.PUBLIC_URL + TourMapImage} alt="Tour map"/>
         {/* TODO Route selection here */}
-
-        <Button onClick={confirmUpdate}>Confirm</Button>
+        <Button onClick={confirmUpdate} className="trip-button">Confirm</Button>
+      </span>
       </div>
     );
   }
   else if (status === "At port") {
     return (
       <div>
-        <h2>Current status</h2>
-        <TripNavigation status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
-        <Form>
-          <Form.Group>
-            <Form.Label>Current port</Form.Label>
-            <Form.Control as="select" defaultValue={currentPort} onChange={currentPortSelect}>
-              {ports.map((value, index) => {
-                return <option key={index}>{value}</option>
-              })}
-            </Form.Control>
-          </Form.Group>
-        </Form>
-        <h2>Departure time</h2>
-        <div>
-          <TimePicker value={departureTime} onChange={updateDepartureTime}/>
-        </div>
-        <Button onClick={confirmDepartureTime}>Set</Button>
+        <h2 className="title">Trip</h2>
+        <TripNavigation className="navigation" status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
+        <img src={process.env.PUBLIC_URL + TourMapImage} alt="Tour map" id="port-img"/>
+        <span className="port-select">
+          <Form>
+            <Form.Group style={{paddingBottom: "3%"}}>
+              <Form.Label>Current port:</Form.Label>
+              <Form.Control as="select" defaultValue={currentPort} onChange={currentPortSelect}  style={{marginBottom: "3%"}}>
+                {ports.map((value, index) => {
+                  return <option key={index}>{value}</option>
+                })}
+              </Form.Control>
+            </Form.Group>
+          </Form>
+          <p>Departure time</p>
+          <TimePicker className="timer" value={departureTime} onChange={updateDepartureTime}/>
+          <Button onClick={confirmDepartureTime} className="trip-button">Set</Button>
+        </span>
       </div>
     );
   }
   else {
     return (
       <div>
-        <h2>Current status</h2>
-        <TripNavigation status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
+        <h2 className="title">Trip</h2>
+        <TripNavigation className="navigation" status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
       </div>
     );
   }

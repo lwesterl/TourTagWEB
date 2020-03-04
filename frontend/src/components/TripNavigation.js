@@ -8,7 +8,7 @@ import { Nav } from "react-bootstrap";
 export default class TripNavigation extends React.Component {
   render() {
     return (
-      <Nav variant="pills">
+      <Nav variant="pills" className={this.props.className}>
         {this.props.TripStatus.map((value, index) => {
           return (<Nav.Item key={index}>
                     <Nav.Link
