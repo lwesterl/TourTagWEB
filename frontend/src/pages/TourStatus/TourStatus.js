@@ -4,7 +4,7 @@ import styled, { keyframes } from 'styled-components';
 
 import { TripStatus } from "../Trip/Trip.js";
 
-const Image = "./jact192.png";
+const Image = "./yacht192.png";
 const AnimationDiv = styled.div`animation: 10s ${keyframes`${shake}`} infinite; float: left; margin-left: 20%`;
 
 export default function TourStatus() {
@@ -62,7 +62,7 @@ export default function TourStatus() {
         <h2 className="title">ETA: {notDisplayTime ? "Right now" : remainingTime(estimatedArrivalTime)}</h2>
         {/* In a real end product gps location should be showed on a map here */}
         <AnimationDiv>
-          <img  src={process.env.PUBLIC_URL + Image}/>
+          <img  src={process.env.PUBLIC_URL + Image} alt="Yacht animation"/>
         </AnimationDiv>
       </div>
     )
