@@ -3,6 +3,7 @@ import { Form, Button } from "react-bootstrap";
 import TimePicker from "react-time-picker";
 
 import TripNavigation from "../../components/TripNavigation.js";
+import TourStatus from "../TourStatus/TourStatus";
 import "./Trip.css";
 
 const TourMapImage = "/TourMap.png";
@@ -137,6 +138,7 @@ export default function Trip() {
       <div>
         <h2 className="title">Trip</h2>
         <TripNavigation className="navigation" status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
+        <TourStatus/>
       </div>
     );
   }

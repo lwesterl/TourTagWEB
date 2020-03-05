@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { shake } from "react-animations";
+import styled, { keyframes } from 'styled-components';
 
 import { TripStatus } from "../Trip/Trip.js";
 
+const Image = "./jact192.png";
+const AnimationDiv = styled.div`animation: 10s ${keyframes`${shake}`} infinite; float: left; margin-left: 20%`;
+
 export default function TourStatus() {
 
-  let status = "At port"; // TODO from API
+  let status = "Traveling to port"; // TODO from API
   let port = "Helsinki"; // TODO from API
   let nextPort = "Turku"; // TODO from API
   let departureTime = "14:45"; // TODO from API
@@ -37,23 +42,28 @@ export default function TourStatus() {
   if (status === "Not on tour") {
     return (
       <div>
-        <h2>No ongoing tour</h2>
+        <h2 className="title">No ongoing tour</h2>
       </div>
     )
   }
   else if (status === "At port") {
     return (
       <div>
-        <h2>Currently at port of {port}</h2>
-        <h2>Departure time: {departureTime}</h2>
+        <h2 className="title">Currently at port of {port}</h2>
+        <h2 className="title">Departure time: {departureTime}</h2>
+        {/* In a real end product map of the city should be showed here */}
       </div>
     );
   }
   else {
     return (
       <div>
-        <h2>On the way to {nextPort} from {port}</h2>
-        <h2>ETA: {notDisplayTime ? "Right now" : remainingTime(estimatedArrivalTime)}</h2>
+        <h2 className="title">On the way to {nextPort} from {port}</h2>
+        <h2 className="title">ETA: {notDisplayTime ? "Right now" : remainingTime(estimatedArrivalTime)}</h2>
+        {/* In a real end product gps location should be showed on a map here */}
+        <AnimationDiv>
+          <img  src={process.env.PUBLIC_URL + Image}/>
+        </AnimationDiv>
       </div>
     )
   }
