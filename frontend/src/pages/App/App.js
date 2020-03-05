@@ -3,6 +3,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { Navbar, Nav } from "react-bootstrap";
 
 import Routes from "../../Routes";
+import Footer from "../../components/Footer";
 
 
 const LogoImage = "./logo192.png"; // TODO make some logo
@@ -14,6 +15,8 @@ export function setStoredState(name, state) {
 export function getStoredState(name) {
   return localStorage.getItem(name);
 }
+
+const year = new Date().getFullYear();
 
 /**
   *   Initial app page (connected to index.html)
@@ -50,6 +53,9 @@ export default function App(props) {
       <Router>
         <Routes authProps={{ isAuthenticated, userHasAuthenticated }}/>
       </Router>
+      <Footer>
+        <p>© {year} TourTag</p>
+      </Footer>
     </div>
   );
 }
