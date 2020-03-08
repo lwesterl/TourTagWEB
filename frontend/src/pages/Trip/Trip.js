@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
 import TimePicker from "react-time-picker";
 
 import TripNavigation from "../../components/TripNavigation.js";
 import TourStatus from "../TourStatus/TourStatus";
+import { API_Route } from "../../Routes";
 import "./Trip.css";
 
 const TourMapImage = "/TourMap.png";
@@ -15,10 +16,27 @@ export const TripStatus = ["At port", "Traveling to next port", "Not on tour"];
   *   Render Trip page which is used by tour guides
   */
 export default function Trip() {
-  let ports = ["Turku", "Helsinki", "Vaasa", "Oulu", "Ahvenanmaa"]; // TODO from API
-  let departurePort = "Helsinki"; // TODO from API
-  let destinationPort = "Ahvenanmaa"; // TODO from API
-  let currentPort = ""; // TODO from API
+
+  // GET Ports from API
+  const [ports, setPorts] = useState([])
+  const [departurePort, setDeparturePort] = useState("Hamina");
+  const [destinationPort, setDestinationPort] = useState("Helsinki");
+  const [currentPort, setCurrentPort] = useState("");
+
+  async function fetchPorts() {
+    const res = await fetch(API_Route + "/ports");
+    const content = await res.json();
+    setPorts(JSON.parse(content).port);
+  }
+
+  useEffect(() => {
+    fetchPorts();
+  }, [])
+
+
+  //let departurePort = ""; // TODO from API
+  //let destinationPort = ""; // TODO from API
+  //let currentPort = ""; // TODO from API
   const [status, setStatus] = useState("Not on tour"); // TODO from API
   const [departureTime, setDepartureTime] = useState(getDepartureTime());
   console.log(departureTime)
@@ -41,20 +59,20 @@ export default function Trip() {
 
   function DeparturePortSelect(event) {
     if (ports.includes(event.target.value)) {
-      departurePort = event.target.value;
+      setDeparturePort(event.target.value);
     }
   }
 
   function DestinationPortSelect(event) {
     if (ports.includes(event.target.value)) {
-      destinationPort = event.target.value;
+      setDestinationPort(event.target.value);
     }
   }
 
   function currentPortSelect(event) {
     // TODO Connect to API
     if (ports.includes(event.target.value)) {
-      currentPort = event.target.value;
+      setCurrentPort(event.target.value);
     }
   }
 
@@ -97,7 +115,7 @@ export default function Trip() {
               <Form.Label>Destination port:</Form.Label>
               <Form.Control as="select" defaultValue={destinationPort} onChange={DestinationPortSelect} style={{marginBottom: "3%"}}>
                 {ports.map((value, index) => {
-                  return <option key={index}>{value}</option>
+                  if (value !== departurePort) return <option key={index}>{value}</option>
                 })}
               </Form.Control>
             </Form.Group>

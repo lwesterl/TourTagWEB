@@ -8,6 +8,9 @@ import Logout from "./pages/Logout/Logout";
 import TourStatus from "./pages/TourStatus/TourStatus";
 import Trip from "./pages/Trip/Trip";
 
+// Set route for API requests, use this as basis for every API call
+export const API_Route = process.env.NODE_ENV === "production" ? "/api" : "//localhost:8080";
+
 
 /**
   *   Show a login page before accessing Trip page
@@ -18,7 +21,9 @@ const PrivateRoute = ({ component: Component, authProps, ...rest }) => (
   )} />
 )
 
-
+/**
+  *   Create routes between the pages
+  */
 export default function Routes({ authProps }) {
   return (
     <Switch>
