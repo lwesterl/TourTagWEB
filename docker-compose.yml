@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+
+  backend:
+    image: tourtagbackend
+    volumes:
+      - ../tourtag/tourtag.db:/backend/tourtag.db
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+
+  frontend:
+    image: tourtagclient
+    ports:
+      - 5000:5000
+    restart: unless-stopped
+
+  proxy:
+    image: nginx
+    volumes:
+      - ./nginx_conf.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/logs:/var/log/nginx
+      - ./nginx/cache/:/etc/nginx/cache
+    ports:
+      - 80:80
+    restart: unless-stopped
