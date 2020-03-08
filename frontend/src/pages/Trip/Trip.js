@@ -17,12 +17,14 @@ export const TripStatus = ["At port", "Traveling to next port", "Not on tour"];
   */
 export default function Trip() {
 
-  // GET Ports from API
+  // GET Ports and Routes from API
   const [ports, setPorts] = useState([])
+  const [routes, setRoutes] = useState([])
   const [departurePort, setDeparturePort] = useState("Hamina");
   const [destinationPort, setDestinationPort] = useState("Helsinki");
   const [currentPort, setCurrentPort] = useState("");
 
+  // Fetch all Ports from API
   async function fetchPorts() {
     const res = await fetch(API_Route + "/ports");
     const content = await res.json();
@@ -31,15 +33,24 @@ export default function Trip() {
 
   useEffect(() => {
     fetchPorts();
-  }, [])
+  }, []);
+
+  // Fetch all Routes for the selected ports from API
+  async function fetchRoutes() {
+    const res = await fetch(API_Route + `/route?origin=${departurePort}&destination=${destinationPort}`);
+    const content = await res.json();
+    setRoutes(JSON.parse(content).routes);
+  }
+
+  useEffect(() => {
+    fetchRoutes();
+    //console.log(routes);
+    //if (routes[0] !== undefined) console.log(routes[0].route)
+  }, [ports, departurePort, destinationPort]);
 
 
-  //let departurePort = ""; // TODO from API
-  //let destinationPort = ""; // TODO from API
-  //let currentPort = ""; // TODO from API
   const [status, setStatus] = useState("Not on tour"); // TODO from API
   const [departureTime, setDepartureTime] = useState(getDepartureTime());
-  console.log(departureTime)
 
   function getDepartureTime() {
     // TODO connect this to API
@@ -76,10 +87,16 @@ export default function Trip() {
     }
   }
 
-  function confirmUpdate(event) {
-    // TODO connect to API
-    console.log(departurePort);
-    console.log(destinationPort);
+  // Create new trip on the backend
+  async function confirmUpdate(event) {
+    fetch(API_Route + `/trip/new?route='${routes[0].route}'`,
+      {
+        method: "POST", headers: {"Content-type": "application/json; charset=UTF-8"}
+      })
+      .then(response => {
+        if(response.status === 200) setStatus("At port");
+        else window.alert("Error: Starting a tour failed");
+      });
   }
 
   function updateDepartureTime(value) {
@@ -116,12 +133,16 @@ export default function Trip() {
               <Form.Control as="select" defaultValue={destinationPort} onChange={DestinationPortSelect} style={{marginBottom: "3%"}}>
                 {ports.map((value, index) => {
                   if (value !== departurePort) return <option key={index}>{value}</option>
+                  return <option key={index} disabled>{value}</option>;
                 })}
               </Form.Control>
             </Form.Group>
           </Form>
 
         {/* TODO Route selection here */}
+        { routes !== [] && routes[0] !== undefined &&
+          <p>{routes[0].route}</p>
+        }
         <Button onClick={confirmUpdate}>Confirm</Button>
       </span>
       </div>
