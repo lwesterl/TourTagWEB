@@ -104,7 +104,7 @@ export default function Trip() {
           </Form>
 
         {/* TODO Route selection here */}
-        <Button onClick={confirmUpdate} className="trip-button">Confirm</Button>
+        <Button onClick={confirmUpdate}>Confirm</Button>
       </span>
       </div>
     );
@@ -128,7 +128,7 @@ export default function Trip() {
           </Form>
           <p>Departure time</p>
           <TimePicker className="timer" value={departureTime} onChange={updateDepartureTime}/>
-          <Button onClick={confirmDepartureTime} className="trip-button">Set</Button>
+          <Button onClick={confirmDepartureTime}>Set</Button>
         </span>
       </div>
     );

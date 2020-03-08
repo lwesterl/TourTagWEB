@@ -45,7 +45,7 @@ export default function Login(props) {
       <div id="error_div"/>
       <form onSubmit={formSubmit} className="form">
         <FormGroup>
-          <FormLabel>Username:</FormLabel>
+          <FormLabel className="form">Username:</FormLabel>
           <FormControl style={{marginBottom: "3%"}}
             autoFocus
             type="text"
@@ -55,7 +55,7 @@ export default function Login(props) {
           />
         </FormGroup>
         <FormGroup controlId="password">
-          <FormLabel>Password:</FormLabel>
+          <FormLabel className="form">Password:</FormLabel>
           <FormControl style={{marginBottom: "3%"}}
             value={password}
             onChange={e => setPassword(e.target.value)}
@@ -63,7 +63,7 @@ export default function Login(props) {
             className="form"
           />
         </FormGroup>
-        <Button block disabled={!validateForm()} type="submit">
+        <Button block disabled={!validateForm()} className="form" type="submit">
           Login
         </Button>
       </form>
