@@ -6,17 +6,38 @@ import { TripStatus } from "../Trip/Trip.js";
 
 const Image = "./yacht192.png";
 const AnimationDiv = styled.div`animation: 10s ${keyframes`${shake}`} infinite; float: left; margin-left: 20%`;
+const StatusUpdatePeriod = 5000; // 5 s
 
+/**
+  *   Display information to tour members
+  */
 export default function TourStatus() {
 
-  let status = "Traveling to port"; // TODO from API
-  let port = "Helsinki"; // TODO from API
+  const [status, setStatus] = useState("");
+
+  // Update status periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Fetch status from API
+      if (status === "At port") setStatus("Traveling to next port");
+      else setStatus("At port");
+      }, StatusUpdatePeriod);
+      return () => clearInterval(interval);
+  }, [status]);
+
+  const [port, setPort] = useState("");
+  const [nextPort, setNextPort] = useState("");
+  const [departureTime, setDepartureTime] = useState("");
+
+  /*let port = "Helsinki"; // TODO from API
   let nextPort = "Turku"; // TODO from API
-  let departureTime = "14:45"; // TODO from API
+  let departureTime = "14:45"; // TODO from API*/
   let estimatedArrivalTime = "14:48"; // TODO from API combination of departure time and travel time
   const [notDisplayTime, setNotDisplayTime] = useState(false);
 
   const [time, setTime] = useState(new Date());
+
+  // Update time to display a ticking clock
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => {
@@ -24,6 +45,7 @@ export default function TourStatus() {
     };
   }, []);
 
+  // Calculate how much time is left to value of timestr
   function remainingTime(timestr) {
     const targetTime = timestr.split(":");
     let hours = parseInt(targetTime[0]) - time.getHours();

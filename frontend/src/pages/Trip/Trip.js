@@ -109,13 +109,6 @@ export default function Trip() {
     return "";
   }
 
-  function currentPortSelect(event) {
-    // TODO Connect to API
-    if (ports.includes(event.target.value)) {
-      setCurrentPort(event.target.value);
-    }
-  }
-
   // Create new trip on the backend
   async function confirmUpdate(event) {
     if ((routes !== []) && (routes[0] !== undefined) && (() =>
@@ -131,7 +124,10 @@ export default function Trip() {
         method: "POST", headers: {"Content-type": "application/json; charset=UTF-8"}
       })
       .then(response => {
-        if(response.status === 200) setStatus("At port");
+        if(response.status === 200) {
+          setStatus("At port");
+          setCurrentPort(selectedRoute.split(",")[0]);
+        }
         else window.alert("Error: Starting a tour failed");
       });
     } else {
@@ -139,6 +135,7 @@ export default function Trip() {
     }
   }
 
+  // Set departureTime using TimePicker
   function updateDepartureTime(value) {
     if (value !== null) {
       setDepartureTime(value);
@@ -225,12 +222,13 @@ export default function Trip() {
         <div className="port-select">
           <Form>
             <Form.Group style={{paddingBottom: "3%"}}>
-              <Form.Label>Current port:</Form.Label>
-              <Form.Control as="select" defaultValue={currentPort} onChange={currentPortSelect}  style={{marginBottom: "3%"}}>
+              <Form.Label>Current port: <strong>{currentPort}</strong></Form.Label>
+              {/*}<Form.Control as="select" defaultValue={currentPort} onChange={currentPortSelect}  style={{marginBottom: "3%"}}>
                 {ports.map((value, index) => {
                   return <option key={index}>{value}</option>
                 })}
               </Form.Control>
+              */}
             </Form.Group>
           </Form>
           <p>Departure time</p>
