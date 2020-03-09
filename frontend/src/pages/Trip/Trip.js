@@ -23,6 +23,7 @@ export default function Trip() {
   const [departurePort, setDeparturePort] = useState("Hamina");
   const [destinationPort, setDestinationPort] = useState("Helsinki");
   const [currentPort, setCurrentPort] = useState("");
+  const [selectedRoute, setSelectedRoute] = useState("");
 
   // Fetch all Ports from API
   async function fetchPorts() {
@@ -31,6 +32,7 @@ export default function Trip() {
     setPorts(JSON.parse(content).port);
   }
 
+  // Use effect to fetch ports when the page is loaded
   useEffect(() => {
     fetchPorts();
   }, []);
@@ -42,11 +44,15 @@ export default function Trip() {
     setRoutes(JSON.parse(content).routes);
   }
 
+  // Use effect to refetch routes when any of the ports state variables is changed
   useEffect(() => {
     fetchRoutes();
-    //console.log(routes);
-    //if (routes[0] !== undefined) console.log(routes[0].route)
   }, [ports, departurePort, destinationPort]);
+
+  // Use effect to select the first route by default when routes are updated
+  useEffect(() => {
+    if ((routes !== []) && (routes[0] !== undefined)) setSelectedRoute(routes[0].route);
+  }, [routes]);
 
 
   const [status, setStatus] = useState("Not on tour"); // TODO from API
@@ -80,6 +86,21 @@ export default function Trip() {
     }
   }
 
+  function RouteSelect(event) {
+    setSelectedRoute(event.target.value);
+  }
+
+  function getRouteTraveltime() {
+    if ((routes !== [])) {
+      for (let i = 0; i < routes.length; i++) {
+        if (routes[i].route === selectedRoute) {
+          return `Estimated travel time: ${routes[i].traveltime}`;
+        }
+      }
+    }
+    return "";
+  }
+
   function currentPortSelect(event) {
     // TODO Connect to API
     if (ports.includes(event.target.value)) {
@@ -89,7 +110,15 @@ export default function Trip() {
 
   // Create new trip on the backend
   async function confirmUpdate(event) {
-    fetch(API_Route + `/trip/new?route='${routes[0].route}'`,
+    if ((routes !== []) && (routes[0] !== undefined) && (() =>
+      {
+        // Check that the route is valid
+        for (let i = 0; i < routes.length; i++) {
+          if (routes[i].route === selectedRoute) return true;
+        }
+        return false;
+      })) {
+      fetch(API_Route + `/trip/new?route='${routes[0].route}'`,
       {
         method: "POST", headers: {"Content-type": "application/json; charset=UTF-8"}
       })
@@ -97,6 +126,9 @@ export default function Trip() {
         if(response.status === 200) setStatus("At port");
         else window.alert("Error: Starting a tour failed");
       });
+    } else {
+      window.alert("An invalid route selected");
+    }
   }
 
   function updateDepartureTime(value) {
@@ -139,10 +171,20 @@ export default function Trip() {
             </Form.Group>
           </Form>
 
-        {/* TODO Route selection here */}
-        { routes !== [] && routes[0] !== undefined &&
-          <p>{routes[0].route}</p>
+        { routes !== [] &&
+          <Form.Group style={{paddingBottom: "3%"}}>
+            <Form.Label>Tour route:</Form.Label>
+            <Form.Control as="select" onChange={RouteSelect} style={{marginBottom: "3%"}}>
+              {routes.map((value, index) => {
+                return <option key={index}>{value.route}</option>;
+              })}
+            </Form.Control>
+          </Form.Group>
         }
+        { routes !== [] &&
+          <p className="padded-bottom">{getRouteTraveltime()}</p>
+        }
+
         <Button onClick={confirmUpdate}>Confirm</Button>
       </span>
       </div>
