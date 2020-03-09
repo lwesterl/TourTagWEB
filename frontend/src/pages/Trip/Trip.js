@@ -6,6 +6,7 @@ import TripNavigation from "../../components/TripNavigation.js";
 import TourStatus from "../TourStatus/TourStatus";
 import { API_Route } from "../../Routes";
 import "./Trip.css";
+const encodeUrl = require("encodeurl");
 
 const TourMapImage = "/TourMap.png";
 const DepartureTimeOffset = 2; // Time which is added to current time by default
@@ -39,7 +40,7 @@ export default function Trip() {
 
   // Fetch all Routes for the selected ports from API
   async function fetchRoutes(departurePort, destinationPort) {
-    const res = await fetch(API_Route + `/route?origin=${departurePort}&destination=${destinationPort}`);
+    const res = await fetch(encodeUrl(API_Route + `/route?origin=${departurePort}&destination=${destinationPort}`));
     const content = await res.json();
     setRoutes(JSON.parse(content).routes);
   }
