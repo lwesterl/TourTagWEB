@@ -6,12 +6,6 @@
   padding-bottom: 30px;
 }
 
-.trip-button {
-  position: relative;
-  top: 50%;
-  padding-top: 100px;
-}
-
 #port-img {
   float: left;
   margin-left: 10%;
@@ -26,4 +20,16 @@
 
 p.padded-bottom {
   padding-bottom: 50px;
+}
+
+.after-select {
+  display: block;
+  width: 100%;
+  padding-top: 30%;
+}
+
+#arrived-btn {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }

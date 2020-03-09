@@ -38,7 +38,7 @@ export default function Trip() {
   }, []);
 
   // Fetch all Routes for the selected ports from API
-  async function fetchRoutes() {
+  async function fetchRoutes(departurePort, destinationPort) {
     const res = await fetch(API_Route + `/route?origin=${departurePort}&destination=${destinationPort}`);
     const content = await res.json();
     setRoutes(JSON.parse(content).routes);
@@ -46,8 +46,8 @@ export default function Trip() {
 
   // Use effect to refetch routes when any of the ports state variables is changed
   useEffect(() => {
-    fetchRoutes();
-  }, [ports, departurePort, destinationPort]);
+    fetchRoutes(departurePort, destinationPort);
+  }, [departurePort, destinationPort]);
 
   // Use effect to select the first route by default when routes are updated
   useEffect(() => {
@@ -67,29 +67,36 @@ export default function Trip() {
     return `${hours}:${minutes}`;
   }
 
+  // Change status using navigation, this is only for testing
   function NavigationSelect(eventKey, event) {
+    /*
     const res = window.confirm(`Do you want to change trip status to '${eventKey}'`);
     if (res === true) {
       setStatus(eventKey);
     }
+    */
   }
 
+  // Set departurePort from select
   function DeparturePortSelect(event) {
     if (ports.includes(event.target.value)) {
       setDeparturePort(event.target.value);
     }
   }
 
+  // Set destinationPort from select
   function DestinationPortSelect(event) {
     if (ports.includes(event.target.value)) {
       setDestinationPort(event.target.value);
     }
   }
 
+  // Set route from select
   function RouteSelect(event) {
     setSelectedRoute(event.target.value);
   }
 
+  // Get estimated travel time for a route
   function getRouteTraveltime() {
     if ((routes !== [])) {
       for (let i = 0; i < routes.length; i++) {
@@ -144,6 +151,24 @@ export default function Trip() {
     console.log(departureTime);
   }
 
+  // Departed from the current port: update backend
+  function departed() {
+    fetch(API_Route + "/trip/depart")
+    .then(response => {
+      if (response.status === 200) setStatus("Traveling to next port");
+      else window.alert("Error: Departure failed");
+    });
+  }
+
+  // Arrived to a port: update backend
+  function arrived() {
+    fetch(API_Route + "/trip/arrive")
+    .then(response => {
+      if (response.status === 200) setStatus("At port");
+      else window.alert("Error: Arrival failed");
+    });
+  }
+
   if (status === "Not on tour") {
     return (
       <div>
@@ -196,7 +221,7 @@ export default function Trip() {
         <h2 className="title">Trip</h2>
         <TripNavigation className="navigation" status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
         <img src={process.env.PUBLIC_URL + TourMapImage} alt="Tour map" id="port-img"/>
-        <span className="port-select">
+        <div className="port-select">
           <Form>
             <Form.Group style={{paddingBottom: "3%"}}>
               <Form.Label>Current port:</Form.Label>
@@ -210,7 +235,11 @@ export default function Trip() {
           <p>Departure time</p>
           <TimePicker className="timer" value={departureTime} onChange={updateDepartureTime}/>
           <Button onClick={confirmDepartureTime}>Set</Button>
-        </span>
+          <span className="after-select">
+            <Button onClick={departed}>Departed</Button>
+          </span>
+        </div>
+
       </div>
     );
   }
@@ -220,6 +249,7 @@ export default function Trip() {
         <h2 className="title">Trip</h2>
         <TripNavigation className="navigation" status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
         <TourStatus/>
+        <Button id="arrived-btn" onClick={arrived}>Arrived</Button>
       </div>
     );
   }
