@@ -10,8 +10,12 @@ const encodeUrl = require("encodeurl");
 
 const TourMapImage = "/TourMap.png";
 const DepartureTimeOffset = 2; // Time which is added to current time by default
-export const TripStatus = ["At port", "Traveling to next port", "Not on tour"];
-
+// Mapping between database states and client status strings
+export const TripStatus = {
+                              "FINISHED" : "Not on tour",
+                              "ARRIVED" : "At port",
+                              "ON-THE-WAY" : "Traveling to next port"
+                          };
 
 /**
   *   Render Trip page which is used by tour guides
@@ -56,17 +60,48 @@ export default function Trip() {
   }, [routes]);
 
 
-  const [status, setStatus] = useState("Not on tour"); // TODO from API
-  const [departureTime, setDepartureTime] = useState(getDepartureTime());
+  // Status of the tour from API
+  const [status, setStatus] = useState("");
 
-  function getDepartureTime() {
-    // TODO connect this to API
-    let date = new Date();
-    let minutes = date.getMinutes() >= 10 ? `${date.getMinutes()}` : `0${date.getMinutes()}`
-    let hours = date.getHours() + DepartureTimeOffset;
-    if (hours > 23) hours = hours - 24;
-    return `${hours}:${minutes}`;
+  // Fetch tour status from API
+  async function fetchStatus(updateFunc) {
+    const res = await fetch(API_Route + "/trip/state");
+    const content = await res.json();
+    const state = JSON.parse(content);
+    if (state.status === "FINISHED") setStatus(TripStatus[state.status]);
+    else {
+      setStatus(TripStatus[state.stops[0].Status]);
+      setCurrentPort(state.remainingroute.split(",")[0]);
+    }
   }
+
+  // Use effect to fetch status when page is loaded
+  useEffect(() => {
+    fetchStatus();
+  }, []);
+
+
+  // Departure time for the tour from API
+  const [departureTime, setDepartureTime] = useState("00:00");
+
+  // Fetch departureTime from API
+  async function fetchDepartureTime() {
+    const res = await fetch(API_Route + "/trip/state");
+    const content = await res.json();
+    const state = JSON.parse(content);
+    const api_time = state.stops[state.stops.length - 1].DepartureTime.split(" ")[1]; // format: 23.01.2020 12:23:42
+    const date = new Date();
+    let minutes = api_time.split(":")[1];
+    let hours = parseInt(api_time.split(":")[0]) - date.getTimezoneOffset()/60;
+    if (hours > 23) hours -= 24;
+    setDepartureTime(`${hours}:${minutes}`);
+  }
+
+  // Use effect to fetch departureTime when status changes
+  useEffect(() => {
+    fetchDepartureTime();
+  }, [status]);
+
 
   // Change status using navigation, this is only for testing
   function NavigationSelect(eventKey, event) {
@@ -119,7 +154,7 @@ export default function Trip() {
         }
         return false;
       })) {
-      fetch(API_Route + `/trip/new?route='${routes[0].route}'`,
+      fetch(API_Route + `/trip/new?route=${routes[0].route}`,
       {
         method: "POST", headers: {"Content-type": "application/json; charset=UTF-8"}
       })
@@ -140,13 +175,39 @@ export default function Trip() {
     if (value !== null) {
       setDepartureTime(value);
     } else {
-      setDepartureTime(getDepartureTime());
+      // reset the time using API departureTime
+      fetchDepartureTime();
     }
   }
 
+  // Update departureTime to API
+  // TODO this won't work for setting time for the following days
   function confirmDepartureTime(event) {
-    // TODO connect to API
-    console.log(departureTime);
+    // Transfer to relational time values in relation to current time
+    const date = new Date();
+    const times = departureTime.split(":");
+    let hours = parseInt(times[0]) - date.getHours();
+    let mins = parseInt(times[1]) - date.getMinutes();
+    let valid = true;
+    if (hours < 0) valid = false;
+    if (mins < 0) {
+      if (hours <= 0) {
+        valid = false;
+      }
+      hours --;
+      mins += 60;
+    }
+    const hours_val = hours > 9 ? hours: `0${hours}`;
+    const mins_val = mins > 9 ? mins: `0${mins}`;
+    if (valid) {
+      fetch(API_Route + `/trip/departure_in?time=${hours_val}:${mins_val}:00`)
+      .then(response => {
+        if (response.status === 200) window.alert("Departure time updated");
+        else window.alert("Error: Setting departure time failed");
+      })
+    } else {
+      window.alert("Cannot set a past departure time");
+    }
   }
 
   // Departed from the current port: update backend
@@ -162,7 +223,7 @@ export default function Trip() {
   function arrived() {
     fetch(API_Route + "/trip/arrive")
     .then(response => {
-      if (response.status === 200) setStatus("At port");
+      if (response.status === 200) fetchStatus();
       else window.alert("Error: Arrival failed");
     });
   }
@@ -171,7 +232,7 @@ export default function Trip() {
     return (
       <div>
         <h2 className="title">Trip</h2>
-        <TripNavigation className="navigation" status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
+        <TripNavigation className="navigation" status={status} onSelect={NavigationSelect} TripStatus={Object.values(TripStatus)}/>
         <img src={process.env.PUBLIC_URL + TourMapImage} alt="Tour map" id="port-img"/>
         <span className="port-select">
           <Form>
@@ -217,7 +278,7 @@ export default function Trip() {
     return (
       <div>
         <h2 className="title">Trip</h2>
-        <TripNavigation className="navigation" status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
+        <TripNavigation className="navigation" status={status} onSelect={NavigationSelect} TripStatus={Object.values(TripStatus)}/>
         <img src={process.env.PUBLIC_URL + TourMapImage} alt="Tour map" id="port-img"/>
         <div className="port-select">
           <Form>
@@ -246,7 +307,7 @@ export default function Trip() {
     return (
       <div>
         <h2 className="title">Trip</h2>
-        <TripNavigation className="navigation" status={status} onSelect={NavigationSelect} TripStatus={TripStatus}/>
+        <TripNavigation className="navigation" status={status} onSelect={NavigationSelect} TripStatus={Object.values(TripStatus)}/>
         <TourStatus/>
         <Button id="arrived-btn" onClick={arrived}>Arrived</Button>
       </div>
