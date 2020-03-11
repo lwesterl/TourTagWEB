@@ -6,7 +6,7 @@ import Routes from "../../Routes";
 import Footer from "../../components/Footer";
 
 
-const LogoImage = "./logo192.png"; // TODO make some logo
+const LogoImage = "./TourTag_logo192.png";
 
 export function setStoredState(name, state) {
   localStorage.setItem(name, state);
