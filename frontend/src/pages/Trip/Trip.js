@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
 import TimePicker from "react-time-picker";
-import ReactLoading from "react-loading";
 
 import TripNavigation from "../../components/TripNavigation";
 import TourStatus, { getDepartureTime } from "../TourStatus/TourStatus";
@@ -313,14 +312,6 @@ export default function Trip() {
       </div>
     );
   }
-
-  else {
-    return (
-      <div className="centered">
-        <p>Loading</p>
-        <ReactLoading type={"bars"} height={"20%"} witdth={"20%"}/>
-      </div>
-    );
-  }
+  return null;
 
 }
