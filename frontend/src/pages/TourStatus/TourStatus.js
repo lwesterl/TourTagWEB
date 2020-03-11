@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { shake } from "react-animations";
 import styled, { keyframes } from 'styled-components';
+import ReactLoading from "react-loading";
 
 import { TripStatus } from "../Trip/Trip";
 import { API_Route } from "../../Routes";
@@ -53,8 +54,6 @@ export default function TourStatus() {
         const routes = state.route.split(",");
         setNextPort(routes[routes.indexOf(state.stops[0].Stop) + 1]);
         setDepartureTime(getDepartureTime(state.stops[0].DepartureTime.split(" ")[1]));
-
-
       } else {
         setPort(state.stops[1].Stop);
         setNextPort(state.stops[0].Stop);
@@ -137,7 +136,7 @@ export default function TourStatus() {
       </div>
     );
   }
-  else {
+  else if (status === "Traveling to next port") {
     return (
       <div>
         <h2 className="title">On the way to {nextPort} from {port}</h2>
@@ -148,6 +147,14 @@ export default function TourStatus() {
         </AnimationDiv>
       </div>
     )
+  }
+  else {
+    return (
+      <div className="centered">
+        <p>Loading</p>
+        <ReactLoading  type={"bars"} height={"20%"} witdth={"20%"}/>
+      </div>
+    );
   }
 
 }

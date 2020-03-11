@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
 import TimePicker from "react-time-picker";
+import ReactLoading from "react-loading";
 
 import TripNavigation from "../../components/TripNavigation";
 import TourStatus, { getDepartureTime } from "../TourStatus/TourStatus";
@@ -152,17 +153,18 @@ export default function Trip() {
         }
         return false;
       })) {
-      fetch(API_Route + `/trip/new?route=${routes[0].route}`,
-      {
-        method: "POST", headers: {"Content-type": "application/json; charset=UTF-8"}
-      })
-      .then(response => {
-        if(response.status === 200) {
-          setStatus("At port");
-          setCurrentPort(selectedRoute.split(",")[0]);
-        }
-        else window.alert("Error: Starting a tour failed");
-      });
+        const url = encodeUrl(API_Route + `/trip/new?route=${selectedRoute}`);
+        fetch(url,
+        {
+          method: "POST", headers: {"Content-type": "application/json; charset=UTF-8"}
+        })
+        .then(response => {
+          if(response.status === 200) {
+            setStatus("At port");
+            setCurrentPort(selectedRoute.split(",")[0]);
+          }
+          else window.alert("Error: Starting a tour failed");
+        });
     } else {
       window.alert("An invalid route selected");
     }
@@ -301,13 +303,22 @@ export default function Trip() {
       </div>
     );
   }
-  else {
+  else if (status === "Traveling to next port") {
     return (
       <div>
         <h2 className="title">Trip</h2>
         <TripNavigation className="navigation" status={status} onSelect={NavigationSelect} TripStatus={Object.values(TripStatus)}/>
         <TourStatus/>
         <Button id="arrived-btn" onClick={arrived}>Arrived</Button>
+      </div>
+    );
+  }
+
+  else {
+    return (
+      <div className="centered">
+        <p>Loading</p>
+        <ReactLoading type={"bars"} height={"20%"} witdth={"20%"}/>
       </div>
     );
   }
