@@ -2,14 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
 import TimePicker from "react-time-picker";
 
-import TripNavigation from "../../components/TripNavigation.js";
-import TourStatus from "../TourStatus/TourStatus";
+import TripNavigation from "../../components/TripNavigation";
+import TourStatus, { getDepartureTime } from "../TourStatus/TourStatus";
 import { API_Route } from "../../Routes";
 import "./Trip.css";
 const encodeUrl = require("encodeurl");
 
 const TourMapImage = "/TourMap.png";
-const DepartureTimeOffset = 2; // Time which is added to current time by default
 // Mapping between database states and client status strings
 export const TripStatus = {
                               "FINISHED" : "Not on tour",
@@ -89,12 +88,11 @@ export default function Trip() {
     const res = await fetch(API_Route + "/trip/state");
     const content = await res.json();
     const state = JSON.parse(content);
-    const api_time = state.stops[state.stops.length - 1].DepartureTime.split(" ")[1]; // format: 23.01.2020 12:23:42
-    const date = new Date();
-    let minutes = api_time.split(":")[1];
-    let hours = parseInt(api_time.split(":")[0]) - date.getTimezoneOffset()/60;
-    if (hours > 23) hours -= 24;
-    setDepartureTime(`${hours}:${minutes}`);
+    if (state.stops[0].DepartureTime === null) setDepartureTime("00:00");
+    else {
+      const api_time = state.stops[0].DepartureTime.split(" ")[1]; // format: 23.01.2020 12:23:42
+      setDepartureTime(getDepartureTime(api_time));
+    }
   }
 
   // Use effect to fetch departureTime when status changes
