@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { shake } from "react-animations";
 import styled, { keyframes } from 'styled-components';
 
@@ -26,6 +26,8 @@ export function getDepartureTime(api_time) {
   */
 export default function TourStatus() {
 
+  const unmounted = useRef(false);
+
   // State values from API
   const [status, setStatus] = useState("");
   const [port, setPort] = useState("");
@@ -41,12 +43,12 @@ export default function TourStatus() {
     const res = await fetch(API_Route + "/trip/state");
     const content = await res.json();
     const state = JSON.parse(content);
-    if (state.status === "FINISHED") {
+    if ((state.status === "FINISHED") && (!unmounted.current)) {
       setStatus(TripStatus[state.status]);
       setPort(state.destination);
       setNextPort("");
     }
-    else {
+    else if (!unmounted.current){
       setStatus(TripStatus[state.stops[0].Status]);
       if (state.stops[0].Status === "ARRIVED") {
         setPort(state.stops[0].Stop);
@@ -64,15 +66,17 @@ export default function TourStatus() {
   // Update state when page is loaded
   useEffect(() => {
     fetchTourState();
+    return () => {
+      unmounted.current = true
+    }
   }, []);
 
   // Update state periodically
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Fetch status from API
-      fetchTourState();
-      }, StatusUpdatePeriod);
-      return () => clearInterval(interval);
+    const interval = setInterval(() => fetchTourState(), StatusUpdatePeriod);
+      return () => {
+        clearInterval(interval);
+      }
   }, []);
 
 
