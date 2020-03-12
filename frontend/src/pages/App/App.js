@@ -23,8 +23,9 @@ const year = new Date().getFullYear();
   *   Routes to other pages
   */
 export default function App(props) {
-  let authState = getStoredState('authState') === "true" ? true : false;
+  const authState = getStoredState('authState') === "true" ? true : false;
   const [isAuthenticated, userHasAuthenticated] = useState(authState);
+  const [username, setUsername] = useState(getStoredState("username"));
 
   return (
     <div>
@@ -47,11 +48,13 @@ export default function App(props) {
               <Nav.Link href="/logout">Logout</Nav.Link>
             }
           </Nav>
-          {isAuthenticated && <p>Hello, {getStoredState("username")}!</p>}
+          <span id="username_span">
+            {isAuthenticated && <p>Hello, {username}!</p>}
+          </span>
         </Navbar.Collapse>
       </Navbar>
       <Router>
-        <Routes authProps={{ isAuthenticated, userHasAuthenticated }}/>
+        <Routes authProps={{ isAuthenticated, userHasAuthenticated, setUsername}}/>
       </Router>
       <Footer>
         <p>© {year} TourTag</p>
