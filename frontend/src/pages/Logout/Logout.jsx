@@ -14,6 +14,6 @@ export default function Logout(props) {
       props.history.push("/"); // redirect
     });
     return (
-      <h2>Logging out...</h2>
+      <h2 className="centered">Logging out...</h2>
     );
 }
